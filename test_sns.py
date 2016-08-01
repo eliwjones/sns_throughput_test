@@ -10,11 +10,11 @@ import sys
 
 
 def sns_messager(client, heap):
-    http_arn = ARN_BASE + "where is this from?"
+    topic_arn = ARN_BASE + ":dean-test-topic"
     try:
         while True:
             message = heap.get(timeout=1)
-            client.publish(http_arn, message, subject="sns test.")
+            client.publish(topic_arn, message, subject="sns test.")
     except Empty:
         print "Finished."
 
@@ -32,7 +32,7 @@ if len(args) > 1:
 
 # We shall attempt to use one boto client across all green threads.
 # So that, we do not need to keep re-connecting.
-client = boto.sns.connect_to_region("us-west-1", aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET)
+client = boto.sns.connect_to_region(REGION, aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET)
 
 heap = Queue()
 for i in range(messages):
