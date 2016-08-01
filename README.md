@@ -15,4 +15,4 @@ $ source venv/bin/activate
 $ pip install boto gevent
 ```
 
-Make sure to add your EC2 information to conig.py!
+Make sure to add your EC2 information to config.py!
