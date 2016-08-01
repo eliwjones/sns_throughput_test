@@ -19,7 +19,7 @@ def sns_messager(client, heap):
         print "Finished."
 
 
-workers, messages = 400, 1200
+workers, messages = 100, 1000
 print "\nDEFAULTS: workers: %d, messages: %d\n" % (workers, messages)
 print "If one wishes to use more or less workers to send more or less messages:\n"
 print "\tpython test_sns.py <num_workers> <num_messages>\n\n"
