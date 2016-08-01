@@ -9,7 +9,7 @@ $ sudo pip install virtualenv
 
 Application:
 ```
-$ git clone git@github.com:eliwjones/sns_throughput_test.git
+$ git clone https://github.com/eliwjones/sns_throughput_test.git
 $ cd sns_throughput_test
 $ source venv/bin/activate
 $ pip install boto gevent
