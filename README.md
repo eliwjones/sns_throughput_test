@@ -11,6 +11,7 @@ Application:
 ```
 $ git clone https://github.com/eliwjones/sns_throughput_test.git
 $ cd sns_throughput_test
+$ virtualenv venv --distribute
 $ source venv/bin/activate
 $ pip install boto gevent
 ```
