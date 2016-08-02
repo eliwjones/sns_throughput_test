@@ -6,15 +6,26 @@ from gevent.queue import Empty, Queue
 
 import boto.sns
 from config import *
+import time
 import sys
 
 
-def sns_messager(client, heap):
+def logger(done):
+    counter = 0
+    while True:
+        done.get()
+        counter += 1
+        if counter % 50 == 0:
+            print "[%s] %d Messages Sent!" % (time.strftime("%H:%M:%S", time.localtime()), counter)
+
+
+def sns_messager(client, heap, done):
     topic_arn = ARN_BASE + ":dean-test-topic"
     try:
         while True:
             message = heap.get(timeout=1)
             client.publish(topic_arn, message, subject="sns test.")
+            done.put(1)
     except Empty:
         print "Finished."
 
@@ -39,14 +50,19 @@ if len(args) > 2:
 client = boto.sns.connect_to_region(REGION, aws_access_key_id=ACCESS_KEY, aws_secret_access_key=SECRET)
 
 heap = Queue()
+done = Queue()
 for i in range(messages):
     message_id = "id:%d" % (i)
     heap.put(message_id)
 
+gevent.spawn(logger, done)
+
 # Slowly ramp up workers as SNS wakes up.
+green_threads = []
 while workers:
-    green_threads = [gevent.spawn(sns_messager, client, heap) for i in range(batch_size)]
+    green_threads += [gevent.spawn(sns_messager, client, heap, done) for i in range(batch_size)]
     workers -= batch_size
     gevent.sleep(5)
+
 
 gevent.joinall(green_threads)
