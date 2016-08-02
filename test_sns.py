@@ -19,15 +19,19 @@ def sns_messager(client, heap):
         print "Finished."
 
 
-workers, messages = 100, 1000
+workers = 100
+messages = 1000
+batch_size = 50
 print "\nDEFAULTS: workers: %d, messages: %d\n" % (workers, messages)
 print "If one wishes to use more or less workers to send more or less messages:\n"
-print "\tpython test_sns.py <num_workers> <num_messages>\n\n"
+print "\tpython test_sns.py <num_workers> <num_messages> <batch_size>\n\n"
 args = sys.argv[1:]
 if len(args) > 0:
     workers = int(args[0])
 if len(args) > 1:
     message = int(args[1])
+if len(args) > 2:
+    batch_size = int(args[2])
 
 
 # We shall attempt to use one boto client across all green threads.
@@ -39,6 +43,10 @@ for i in range(messages):
     message_id = "id:%d" % (i)
     heap.put(message_id)
 
-green_threads = [gevent.spawn(sns_messager, client, heap) for i in range(workers)]
+# Slowly ramp up workers as SNS wakes up.
+while workers:
+    green_threads = [gevent.spawn(sns_messager, client, heap) for i in range(batch_size)]
+    workers -= batch_size
+    gevent.sleep(5)
 
 gevent.joinall(green_threads)
