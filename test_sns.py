@@ -40,7 +40,7 @@ args = sys.argv[1:]
 if len(args) > 0:
     workers = int(args[0])
 if len(args) > 1:
-    message = int(args[1])
+    messages = int(args[1])
 if len(args) > 2:
     batch_size = int(args[2])
 
@@ -60,6 +60,7 @@ gevent.spawn(logger, done)
 # Slowly ramp up workers as SNS wakes up.
 green_threads = []
 while workers:
+    print "[%s] Starting %d Threads!" % (time.strftime("%H:%M:%S", time.localtime()), batch_size)
     green_threads += [gevent.spawn(sns_messager, client, heap, done) for i in range(batch_size)]
     workers -= batch_size
     gevent.sleep(5)
